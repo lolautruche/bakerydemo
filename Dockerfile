@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.9-slim
 
 # Install packages needed to run your application (not build deps):
 # We need to recreate the /usr/share/man/man{1..8} directories first because
@@ -30,7 +30,7 @@ RUN set -ex \
         zlib1g-dev \
     " \
     && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
-    && python3.7 -m venv /venv \
+    && python3.9 -m venv /venv \
     && /venv/bin/pip install -U pip \
     && /venv/bin/pip install --no-cache-dir -r /requirements/production.txt \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
@@ -69,4 +69,4 @@ VOLUME ["/code/bakerydemo/media/images/"]
 ENTRYPOINT ["/code/docker-entrypoint.sh"]
 
 # Start uWSGI
-CMD ["/venv/bin/uwsgi", "--show-config"]
+CMD ["/venv/bin/blackfire-python", "/venv/bin/uwsgi", "--show-config"]
