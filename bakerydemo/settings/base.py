@@ -9,10 +9,15 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import base64
+import json
 import os
 
 # Build paths inside the project like this: os.path.join(PROJECT_DIR, ...)
+from urllib.parse import urlparse
+
+from platformshconfig import Config
+
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -183,3 +188,42 @@ WAGTAILSEARCH_BACKENDS = {
 
 # Wagtail settings
 WAGTAIL_SITE_NAME = "bakerydemo"
+
+# Import some Platform.sh settings from the environment.
+
+config = Config()
+
+if config.is_valid_platform():
+    if config.appDir:
+        STATIC_ROOT = os.path.join(config.appDir, 'static')
+    if config.projectEntropy:
+        SECRET_KEY = config.projectEntropy
+
+    routes = os.getenv('PLATFORM_ROUTES')
+    if routes:
+        routes = json.loads(base64.b64decode(routes).decode('utf-8'))
+        app_name = os.getenv('PLATFORM_APPLICATION_NAME')
+        for url, route in routes.items():
+            host = urlparse(url).netloc
+            if (host not in ALLOWED_HOSTS and route['type'] == 'upstream'
+                    and route['upstream'] == app_name):
+                ALLOWED_HOSTS.append(host)
+
+    relationships = os.getenv('PLATFORM_RELATIONSHIPS')
+    if relationships:
+        relationships = json.loads(base64.b64decode(relationships).decode('utf-8'))
+        db_settings = relationships['database'][0]
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': db_settings['path'],
+                'USER': db_settings['username'],
+                'PASSWORD': db_settings['password'],
+                'HOST': db_settings['host'],
+                'PORT': db_settings['port'],
+            },
+            'sqlite': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            }
+        }
