@@ -35,6 +35,10 @@ web:
     locations:
         "/":
             passthru: true
+        '/favicon.ico':
+            root: 'static/img/bread-favicon.ico'
+            allow: true
+            expires: 6h
         "/static":
             root: "static"
             expires: 1h
