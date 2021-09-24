@@ -19,8 +19,7 @@ relationships:
 
 variables:
     env:
-        BLACKFIRE_AGENT_SOCKET: 'unix:///run/blackfire.sock'
-        BLACKFIRE_LOG_FILE: '/tmp/blackfire.log'
+#        BLACKFIRE_LOG_FILE: '/tmp/blackfire.log'
         DJANGO_SETTINGS_MODULE: 'bakerydemo.settings.production'
         DJANGO_DEBUG: 'off'
 
