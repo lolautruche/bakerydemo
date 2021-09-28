@@ -16,6 +16,8 @@ dependencies:
 # side is in the form `<service name>:<endpoint name>`.
 relationships:
     database: "db:postgresql"
+    elasticsearch: "elastic:elasticsearch"
+    rediscache: "cache_redis:redis"
 
 variables:
     env:
@@ -69,3 +71,4 @@ hooks:
     rm -rf logs
   deploy: |
     python manage.py migrate
+    python manage.py update_index

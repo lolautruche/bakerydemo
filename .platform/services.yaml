@@ -8,3 +8,10 @@
 db:
     type: postgresql:12
     disk: 1024
+
+cache_redis:
+    type: redis:6.0
+
+elastic:
+    type: elasticsearch:7.10
+    disk: 256

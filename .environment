@@ -1,1 +1,9 @@
-BLACKFIRE_AGENT_SOCKET='unix:///run/blackfire.sock'
+export BLACKFIRE_AGENT_SOCKET='unix:///run/blackfire.sock'
+
+# Properly exposing services
+DECODED_RELATIONSHIPS=$(echo $PLATFORM_RELATIONSHIPS | base64 --decode)
+# Elasticsearch: https://docs.platform.sh/configuration/services/elasticsearch.html#relationship
+export ELASTICSEARCH_ENDPOINT=$(echo $DECODED_RELATIONSHIPS | jq -r ".elasticsearch[0].ip")
+export ELASTICSEARCH_PORT=$(echo $DECODED_RELATIONSHIPS | jq -r ".elasticsearch[0].port")
+# Redis: https://docs.platform.sh/configuration/services/redis.html#relationship
+export CACHE_URL="redis://$(echo $DECODED_RELATIONSHIPS | jq -r ".rediscache[0].ip"):$(echo $DECODED_RELATIONSHIPS | jq -r ".rediscache[0].port")"
